@@ -1,0 +1,17 @@
+{
+  "name": "livenat",
+  "version": "0.1.0",
+  "description": "Electron overlay that monitors Google and Cloudflare latency.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0"
+  }
+}
