@@ -1,17 +1,39 @@
 {
   "name": "livenat",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Minimal always-on-top connectivity indicator — shows online/offline status with latency sparkline.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --win"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jschneider_microsoft/LiveNAT.git"
+  },
+  "author": "Jens Schneider",
   "license": "MIT",
   "engines": {
     "node": ">=20"
   },
+  "build": {
+    "appId": "com.livenat.app",
+    "productName": "LiveNAT",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "LiveNAT-${version}.exe"
+    }
+  },
   "devDependencies": {
-    "electron": "^32.0.0"
+    "electron": "^32.0.0",
+    "electron-builder": "^25.1.8"
   }
 }
