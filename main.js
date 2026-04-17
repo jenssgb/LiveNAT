@@ -88,10 +88,11 @@ let win, monitor;
 const DEFAULT_STATE = { status: 'offline', latency: null, failRate: 1, history: [] };
 
 ipcMain.handle('get-state', () => monitor?.getState() ?? DEFAULT_STATE);
-ipcMain.on('window-move', (_e, { dx, dy }) => {
-  if (!win || win.isDestroyed()) return;
+ipcMain.on('window-move', (e, { dx, dy }) => {
+  if (!win || win.isDestroyed() || e.sender !== win.webContents) return;
+  if (typeof dx !== 'number' || typeof dy !== 'number' || !isFinite(dx) || !isFinite(dy)) return;
   const [x, y] = win.getPosition();
-  win.setPosition(x + dx, y + dy);
+  win.setPosition(x + Math.round(dx), y + Math.round(dy));
 });
 
 if (!app.requestSingleInstanceLock()) {
@@ -120,13 +121,17 @@ function launch() {
     hasShadow: false, backgroundColor: '#00000000', show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false, contextIsolation: true
+      nodeIntegration: false, contextIsolation: true, sandbox: true,
+      webSecurity: true, allowRunningInsecureContent: false, webviewTag: false
     }
   });
 
   win.once('ready-to-show', () => { win.show(); win.setAlwaysOnTop(true, 'screen-saver'); });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   win.setMenuBarVisibility(false);
+
+  win.webContents.on('will-navigate', e => e.preventDefault());
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 
   const menu = Menu.buildFromTemplate([
     {
