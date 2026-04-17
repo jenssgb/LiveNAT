@@ -1,7 +1,7 @@
 {
   "name": "livenat",
   "version": "0.1.0",
-  "description": "Electron overlay that monitors Google and Cloudflare latency.",
+  "description": "Minimal always-on-top connectivity indicator — shows online/offline status with latency sparkline.",
   "main": "main.js",
   "scripts": {
     "start": "electron ."

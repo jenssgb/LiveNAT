@@ -1,431 +1,112 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>LiveNAT Overlay</title>
+    <title>LiveNAT</title>
     <style>
       :root {
-        color-scheme: dark;
         --green: #4cffb0;
-        --orange: #ffb347;
+        --yellow: #ffcc00;
         --red: #ff5f6d;
-        --text-primary: #ffffff;
-        --text-secondary: rgba(255, 255, 255, 0.7);
-        --bg-glass: rgba(15, 20, 25, 0.96);
-        --border-glass: rgba(255, 255, 255, 0.12);
-        --surface: rgba(255, 255, 255, 0.05);
-        --font-mono: "JetBrains Mono", "Consolas", monospace;
+        --bg: rgba(15, 20, 25, 0.92);
+        --border: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.85);
+        --dim: rgba(255, 255, 255, 0.4);
+        --mono: "Consolas", "JetBrains Mono", monospace;
       }
+      * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+      body { background: transparent; overflow: hidden; font-family: var(--mono); }
 
-      * {
-        box-sizing: border-box;
-        user-select: none;
-        -webkit-user-drag: none;
-        cursor: default;
-      }
-
-      body {
-        margin: 0;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        background: transparent;
-        font-family: var(--font-mono);
-        font-size: 13px;
-        color: var(--text-primary);
-      }
-
-      .overlay {
-        width: 100%;
-        height: 100%;
-        padding: 10px 14px;
-        background: var(--bg-glass);
-        border: 1px solid var(--border-glass);
-        border-radius: 12px;
+      .pill {
+        width: 200px;
+        height: 60px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 14px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        -webkit-app-region: no-drag; 
-      }
-
-      .overlay[data-mode="mini"] {
-        height: auto;
-        padding: 8px 12px;
-        gap: 0;
-        background: rgba(10, 12, 16, 0.98);
-      }
-
-      /* --- Chrome Header --- */
-      .chrome {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        height: 18px;
-        margin-bottom: 2px;
-      }
-
-      .chrome-buttons {
-        display: flex;
-        gap: 6px;
-      }
-
-      .chrome-btn {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 4px;
-        color: var(--text-secondary);
-        font-family: inherit;
-        font-size: 9px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        padding: 0 6px;
-        height: 18px;
-        line-height: 16px;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .chrome-btn:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: var(--text-primary);
-        border-color: rgba(255, 255, 255, 0.4);
-      }
-
-      .chrome-btn--drag {
-        cursor: grab;
+        padding: 8px 14px;
+        gap: 4px;
         -webkit-app-region: drag;
+        cursor: grab;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
       }
 
-      .chrome-btn--drag:active {
-        cursor: grabbing;
-      }
-
-      /* --- Internet Status --- */
       .row {
         display: flex;
         align-items: center;
-        gap: 10px;
-        height: 24px;
+        gap: 8px;
+        height: 20px;
       }
 
       .dot {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        background-color: var(--text-secondary);
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        transition: background-color 0.3s, box-shadow 0.3s;
+        background: var(--dim);
+        flex-shrink: 0;
+        transition: all 0.4s;
       }
 
       .label {
-        flex: 1;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--text-secondary);
-      }
-
-      .value {
-        font-size: 14px;
-        font-weight: 700;
-        font-feature-settings: "tnum";
-      }
-
-      .row[data-state="green"] .dot { background: var(--green); box-shadow: 0 0 10px rgba(76, 255, 176, 0.4); }
-      .row[data-state="orange"] .dot { background: var(--orange); box-shadow: 0 0 10px rgba(255, 179, 71, 0.4); }
-      .row[data-state="red"] .dot { background: var(--red); box-shadow: 0 0 10px rgba(255, 95, 109, 0.4); }
-
-      .row[data-state="orange"] .value { color: var(--orange); }
-      .row[data-state="red"] .value { color: var(--red); }
-
-      /* --- Trend Graph --- */
-      .history-row {
-        position: relative;
-        flex: 1;
-        min-height: 32px;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        overflow: hidden;
-      }
-
-      .history-header { display: none; }
-
-      .history-row svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-
-      .history-line {
-        fill: none;
-        stroke: var(--green);
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        vector-effect: non-scaling-stroke;
-        transition: stroke 0.3s;
-      }
-
-      .history-row[data-tier="orange"] .history-line { stroke: var(--orange); }
-      .history-row[data-tier="red"] .history-line { stroke: var(--red); }
-      .history-row[data-empty="true"] .history-line { opacity: 0; }
-
-      /* --- Teams Section --- */
-      .teams-row {
-        background: var(--surface);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 8px 10px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        height: 48px;
-      }
-
-      /* Logo */
-      .teams-header { display: flex; }
-      .teams-brand { display: flex; }
-
-      .teams-logo-text {
-        display: grid;
-        place-items: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        background: linear-gradient(135deg, #4b73f8, #5856ff);
-        color: white;
-        font-weight: 800;
-        font-size: 15px;
-        box-shadow: 0 4px 12px rgba(75, 115, 248, 0.25);
-      }
-
-      /* LEDs */
-      .mode-leds {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-      }
-
-      .mode-led {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .mode-led-indicator {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
-        transition: all 0.3s;
-      }
-
-      .mode-led-label {
-        font-size: 9px;
-        font-weight: 600;
-        text-transform: uppercase;
-        color: var(--text-secondary);
-        letter-spacing: 0.05em;
-      }
-
-      .mode-led[data-state="green"] .mode-led-indicator { background: var(--green); box-shadow: 0 0 6px var(--green); }
-      .mode-led[data-state="orange"] .mode-led-indicator { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
-      .mode-led[data-state="red"] .mode-led-indicator { background: var(--red); box-shadow: 0 0 6px var(--red); }
-
-      /* Details Toggle */
-      .details-btn {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        color: var(--text-secondary);
-        font-size: 9px;
-        font-weight: 600;
-        text-transform: uppercase;
-        padding: 4px 6px;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .details-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--text-primary);
-        border-color: rgba(255, 255, 255, 0.3);
-      }
-
-      /* --- Mini Mode --- */
-      .overlay[data-mode="mini"] .history-row,
-      .overlay[data-mode="mini"] .teams-row {
-        display: none !important;
-      }
-
-      /* --- Details Overlay --- */
-      .details-card {
-        position: absolute;
-        bottom: 0px;
-        left: 0px;
-        right: 0px;
-        background: #0f1216;
-        border-top: 1px solid var(--border-glass);
-        padding: 14px;
-        border-radius: 0 0 12px 12px;
-        box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
-        z-index: 20;
-      }
-
-      .details-card[hidden] { display: none; }
-
-      .details-card header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-      }
-
-      .details-card header span {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--text-secondary);
-      }
-
-      .details-close {
-        background: none;
-        border: none;
-        color: var(--text-secondary);
-        font-size: 16px;
-        cursor: pointer;
-        padding: 0;
-      }
-
-      .details-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .detail-row {
-        display: flex;
-        justify-content: space-between;
         font-size: 12px;
-        padding-bottom: 6px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-weight: 700;
+        color: var(--text);
+        flex: 1;
       }
 
-      .detail-row:last-child { border-bottom: none; }
-
-      .detail-row span:not(:first-child) {
-        margin-left: 10px;
+      .ms {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--dim);
         font-variant-numeric: tabular-nums;
       }
 
-      .detail-label {
-        color: var(--text-secondary);
-        margin-right: auto;
+      .spark { flex: 1; min-height: 0; }
+      .spark svg { width: 100%; height: 100%; display: block; }
+      .spark-line {
+        fill: none;
+        stroke: var(--green);
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        transition: stroke 0.4s;
       }
 
-      .detail-meta {
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        color: var(--text-secondary);
-      }
+      /* Status colors */
+      [data-s="online"] .dot  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+      [data-s="slow"]   .dot  { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+      [data-s="offline"] .dot { background: var(--red); box-shadow: 0 0 8px var(--red); }
 
-      .detail-note {
-        margin: 6px 0 0 0;
-        font-size: 10px;
-        color: rgba(255, 95, 109, 0.9);
+      [data-s="online"]  .spark-line { stroke: var(--green); }
+      [data-s="slow"]    .spark-line { stroke: var(--yellow); }
+      [data-s="offline"] .spark-line { stroke: var(--red); }
+
+      [data-s="slow"]    .ms { color: var(--yellow); }
+      [data-s="offline"] .ms { color: var(--red); }
+      [data-s="offline"] .label { color: var(--red); }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
       }
+      [data-s="offline"] .dot { animation: pulse 1.5s ease-in-out infinite; }
     </style>
   </head>
   <body>
-    <main class="overlay" role="status" aria-live="polite" data-mode="full">
-      <header class="chrome">
-        <div class="chrome-buttons">
-          <button class="chrome-btn" type="button" data-action="toggle-mini" aria-pressed="false" title="Mini Mode umschalten">
-            Mini
-          </button>
-          <button class="chrome-btn chrome-btn--drag" type="button" data-role="move-handle" aria-label="Overlay verschieben">
-            Move
-          </button>
-        </div>
-      </header>
-
-      <section class="row internet-row" data-role="internet-row" data-state="green">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="label">Internet</span>
-        <span class="value" data-field="value">-- ms</span>
-      </section>
-
-      <section class="history-row" data-role="internet-history" data-tier="orange" data-empty="true">
-        <div class="history-header">
-          <span class="history-label">Trend</span>
-        </div>
-        <svg viewBox="0 0 220 40" preserveAspectRatio="none" aria-hidden="true">
-          <path class="history-line" d="" />
+    <div class="pill" data-s="offline">
+      <div class="row">
+        <span class="dot"></span>
+        <span class="label">Offline</span>
+        <span class="ms"></span>
+      </div>
+      <div class="spark">
+        <svg viewBox="0 0 172 20" preserveAspectRatio="none">
+          <path class="spark-line" d="" />
         </svg>
-      </section>
-
-      <section class="teams-row" data-state="stable">
-        <div class="teams-header">
-          <div class="teams-brand" role="img" aria-label="Microsoft Teams">
-            <span class="teams-logo-text">T</span>
-          </div>
-        </div>
-        
-        <div class="mode-leds">
-          <div class="mode-led" data-mode="audio" data-state="orange">
-            <span class="mode-led-indicator" aria-hidden="true"></span>
-            <span class="mode-led-label">Audio</span>
-          </div>
-          <div class="mode-led" data-mode="video" data-state="orange">
-            <span class="mode-led-indicator" aria-hidden="true"></span>
-            <span class="mode-led-label">Video</span>
-          </div>
-        </div>
-
-        <button class="details-btn" type="button" data-action="toggle-details" aria-expanded="false">
-          Details
-        </button>
-      </section>
-
-      <section class="details-card" data-panel="details" hidden>
-        <header>
-          <span>Netzdetails</span>
-          <button type="button" class="details-close" data-action="close-details" aria-label="Details schließen">×</button>
-        </header>
-        <div class="details-grid">
-          <div class="detail-row" data-detail-row data-target="google">
-            <span class="detail-label">Google</span>
-            <span data-field="median">-- ms</span>
-            <span data-field="fail">--%</span>
-            <span data-field="jitter">-- ms</span>
-          </div>
-          <div class="detail-row" data-detail-row data-target="cloudflare">
-            <span class="detail-label">Cloudflare</span>
-            <span data-field="median">-- ms</span>
-            <span data-field="fail">--%</span>
-            <span data-field="jitter">-- ms</span>
-          </div>
-        </div>
-        <div class="detail-meta">
-          <span class="detail-label">Worst-Case Fails</span>
-          <span data-field="aggregate-fail">--%</span>
-        </div>
-        <p class="detail-note">Letzter Fehler: <span data-field="error">Keine Fehler zuletzt</span></p>
-      </section>
-    </main>
-
-    <script type="module" src="renderer.js"></script>
+      </div>
+    </div>
+    <script src="renderer.js"></script>
   </body>
 </html>
