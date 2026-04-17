@@ -139,8 +139,8 @@ function launch() {
       click: () => {
         dialog.showMessageBox(win, {
           type: 'info',
-          title: 'LiveNAT v1.0.0',
-          message: 'LiveNAT v1.0.0',
+          title: 'LiveNAT v1.1.0',
+          message: 'LiveNAT v1.1.0',
           detail: 'Minimal internet connectivity indicator für ICE-Züge.\n\nCredits:\n• Jens Schneider — Idee, Design & Entwicklung\n• GitHub Copilot (Claude) — Pair Programming & Implementierung\n\ngithub.com/jenssgb/LiveNAT',
           buttons: ['OK']
         });

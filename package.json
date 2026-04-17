@@ -1,6 +1,6 @@
 {
   "name": "livenat",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Minimal always-on-top connectivity indicator — shows online/offline status with latency sparkline.",
   "main": "main.js",
   "scripts": {
