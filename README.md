@@ -28,7 +28,18 @@ npm start
 
 ## How it works
 
-Every 3 seconds, LiveNAT pings Google (`generate_204`) and Cloudflare (`cdn-cgi/trace`) via HTTPS. The worst-case median RTT and packet loss across both probes determines your status. No ICMP, no telemetry — everything stays in-memory.
+Every **3 seconds**, LiveNAT pings Google (`generate_204`) and Cloudflare (`cdn-cgi/trace`) via HTTPS in parallel. The worst-case median RTT and packet loss across both probes determines your status:
+
+| Status | Condition |
+|---|---|
+| 🟢 **Online** | Packet loss < 10% and latency < 300 ms |
+| 🟡 **Instabil** | Loss ≥ 10% or latency > 300 ms |
+| 🔴 **Offline** | Loss > 50% or no successful response |
+
+- Evaluation window: last ~15 seconds (up to 10 samples per target)
+- Timeout per probe: 4 seconds
+- Sparkline: 3-minute RTT trend
+- No ICMP, no telemetry — everything stays in-memory
 
 ## Configuration
 
