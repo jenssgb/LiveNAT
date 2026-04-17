@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, screen, ipcMain, dialog } = require('electron');
 const path = require('node:path');
 const https = require('node:https');
 const { performance } = require('node:perf_hooks');
@@ -132,7 +132,6 @@ function launch() {
     {
       label: 'Über LiveNAT',
       click: () => {
-        const { dialog } = require('electron');
         dialog.showMessageBox(win, {
           type: 'info',
           title: 'LiveNAT v1.0.0',

@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jschneider_microsoft/LiveNAT.git"
+    "url": "https://github.com/jenssgb/LiveNAT.git"
   },
   "author": "Jens Schneider",
   "license": "MIT",
