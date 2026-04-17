@@ -26,10 +26,15 @@
       "package.json"
     ],
     "win": {
-      "target": "portable"
+      "target": "nsis"
     },
-    "portable": {
-      "artifactName": "LiveNAT-${version}.exe"
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "LiveNAT",
+      "artifactName": "LiveNAT-Setup-${version}.exe"
     }
   },
   "devDependencies": {
