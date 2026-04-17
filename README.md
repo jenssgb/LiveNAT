@@ -15,7 +15,7 @@ Drag anywhere. Right-click → **Über LiveNAT** for credits, **Beenden** to qui
 
 ## Download
 
-**[⬇ LiveNAT-Setup-1.0.0.exe](https://github.com/jenssgb/LiveNAT/releases/latest)** — Windows installer, creates Desktop & Start Menu shortcut.
+**[⬇ LiveNAT-Setup-1.1.0.exe](https://github.com/jenssgb/LiveNAT/releases/latest)** — Windows installer, creates Desktop & Start Menu shortcut.
 
 > The exe is not code-signed. Windows SmartScreen may warn — click *More info* → *Run anyway*.
 
