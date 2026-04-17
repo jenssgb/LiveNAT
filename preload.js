@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('livenat', {
     const listener = (_e, data) => fn(data);
     ipcRenderer.on('state-update', listener);
     return () => ipcRenderer.removeListener('state-update', listener);
-  }
+  },
+  moveWindow: (dx, dy) => ipcRenderer.send('window-move', { dx, dy })
 });

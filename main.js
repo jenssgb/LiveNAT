@@ -88,6 +88,11 @@ let win, monitor;
 const DEFAULT_STATE = { status: 'offline', latency: null, failRate: 1, history: [] };
 
 ipcMain.handle('get-state', () => monitor?.getState() ?? DEFAULT_STATE);
+ipcMain.on('window-move', (_e, { dx, dy }) => {
+  if (!win || win.isDestroyed()) return;
+  const [x, y] = win.getPosition();
+  win.setPosition(x + dx, y + dy);
+});
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -123,7 +128,23 @@ function launch() {
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   win.setMenuBarVisibility(false);
 
-  const menu = Menu.buildFromTemplate([{ label: 'Beenden', click: () => app.quit() }]);
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Über LiveNAT',
+      click: () => {
+        const { dialog } = require('electron');
+        dialog.showMessageBox(win, {
+          type: 'info',
+          title: 'LiveNAT v1.0.0',
+          message: 'LiveNAT v1.0.0',
+          detail: 'Minimal internet connectivity indicator für ICE-Züge.\n\nCredits:\n• Jens Schneider — Idee, Design & Entwicklung\n• GitHub Copilot (Claude) — Pair Programming & Implementierung\n\ngithub.com/jenssgb/LiveNAT',
+          buttons: ['OK']
+        });
+      }
+    },
+    { type: 'separator' },
+    { label: 'Beenden', click: () => app.quit() }
+  ]);
   win.webContents.on('context-menu', e => { e.preventDefault(); menu.popup({ window: win }); });
 
   monitor = new ConnectivityMonitor(state => {
