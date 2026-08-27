@@ -6,9 +6,9 @@
   "scripts": {
     "start": "electron .",
     "dist": "npm run dist:all",
-    "dist:x64": "electron-builder --win --x64",
-    "dist:arm64": "electron-builder --win --arm64",
-    "dist:all": "electron-builder --win --x64 --arm64"
+    "dist:x64": "electron-builder --win --x64 --publish never",
+    "dist:arm64": "electron-builder --win --arm64 --publish never",
+    "dist:all": "electron-builder --win --x64 --arm64 --publish never"
   },
   "repository": {
     "type": "git",
