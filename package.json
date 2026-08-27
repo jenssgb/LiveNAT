@@ -5,7 +5,10 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win"
+    "dist": "npm run dist:all",
+    "dist:x64": "electron-builder --win --x64",
+    "dist:arm64": "electron-builder --win --arm64",
+    "dist:all": "electron-builder --win --x64 --arm64"
   },
   "repository": {
     "type": "git",
@@ -35,7 +38,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "LiveNAT",
-      "artifactName": "LiveNAT-Setup-${version}.exe"
+      "artifactName": "LiveNAT-Setup-${version}-${arch}.exe"
     }
   },
   "devDependencies": {

@@ -15,7 +15,7 @@ Drag anywhere. Right-click → **Über LiveNAT** for credits, **Beenden** to qui
 
 ## Download
 
-**[⬇ Download Latest](https://github.com/jenssgb/LiveNAT/releases/latest)** — Windows installer, creates Desktop & Start Menu shortcut.
+**[⬇ Download Latest](https://github.com/jenssgb/LiveNAT/releases/latest)** — Windows installers for x64 and ARM64 (Snapdragon), with Desktop & Start Menu shortcuts.
 
 > The exe is not code-signed. Windows SmartScreen may warn — click *More info* → *Run anyway*.
 
@@ -25,6 +25,14 @@ Drag anywhere. Right-click → **Über LiveNAT** for credits, **Beenden** to qui
 npm install
 npm start
 ```
+
+Create Windows installers for both supported architectures:
+
+```bash
+npm run dist
+```
+
+Use `npm run dist:x64` or `npm run dist:arm64` to build only one architecture.
 
 ## How it works
 
