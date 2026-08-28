@@ -4,18 +4,16 @@ Last updated: 2026-08-28
 
 ## Current state
 
-LiveNAT 1.1.0 is available for Windows x64 and Windows ARM64/Snapdragon.
+LiveNAT 1.1.1 is available for Windows x64 and Windows ARM64/Snapdragon.
 
-- Release: https://github.com/jenssgb/LiveNAT/releases/tag/v1.1.0
-- Successful build: https://github.com/jenssgb/LiveNAT/actions/runs/33097580147
-- ARM64 installer: `LiveNAT-Setup-1.1.0-arm64.exe`
-  - Size: 83,843,521 bytes
-  - SHA-256: `798d7667ba5f0db39e941ec28a67435d89358a3bdd5f120041201418c6eb25a8`
-- x64 installer: `LiveNAT-Setup-1.1.0-x64.exe`
-  - Size: 80,013,054 bytes
-  - SHA-256: `5783e97eae135e48454c1805f66968d748a036afce5c88c578bcf0753536e8f8`
-- The original architecture-neutral x64 asset remains available as
-  `LiveNAT-Setup-1.1.0.exe`.
+- Release: https://github.com/jenssgb/LiveNAT/releases/tag/v1.1.1
+- Successful build: https://github.com/jenssgb/LiveNAT/actions/runs/33173325856
+- ARM64 installer: `LiveNAT-Setup-1.1.1-arm64.exe`
+  - Size: 83,843,681 bytes
+  - SHA-256: `cebc2c82e68881ef09449d2cf6f1c270708bbba592d9bf674f93884a9ded0e8f`
+- x64 installer: `LiveNAT-Setup-1.1.1-x64.exe`
+  - Size: 80,013,195 bytes
+  - SHA-256: `2c05adbcbecce9672edd6ddde3f56edac6cced13276270ddbf3b6e02127a0b08`
 
 The ARM64 installer was downloaded and validated on a Windows Snapdragon
 device:
@@ -28,6 +26,10 @@ device:
 
 ## Implemented
 
+- Constrained the transparent Windows input region to the visible indicator.
+- Fixed the content size at 200 x 60 device-independent pixels.
+- Published version 1.1.1 from GitHub Actions.
+- Documented that LiveNAT must only be built in GitHub Actions.
 - Added explicit `dist:x64`, `dist:arm64`, and `dist:all` npm scripts.
 - Added the target architecture to installer filenames.
 - Added `.github/workflows/windows-build.yml`.
@@ -39,6 +41,7 @@ device:
 
 Relevant commits:
 
+- `7e85e7d` - Fix oversized transparent window input region
 - `e7b789d` - Add Windows ARM64 builds
 - `85d4558` - Disable implicit CI publishing
 - `61a2047` - Publish Windows installers from CI
