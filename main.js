@@ -6,6 +6,15 @@ const { performance } = require('node:perf_hooks');
 const WIDTH = 200;
 const HEIGHT = 60;
 const MARGIN = 16;
+const WINDOW_SHAPE = [
+  { x: 10, y: 0, width: WIDTH - 20, height: 2 },
+  { x: 6, y: 2, width: WIDTH - 12, height: 4 },
+  { x: 2, y: 6, width: WIDTH - 4, height: 6 },
+  { x: 0, y: 12, width: WIDTH, height: HEIGHT - 24 },
+  { x: 2, y: HEIGHT - 12, width: WIDTH - 4, height: 6 },
+  { x: 6, y: HEIGHT - 6, width: WIDTH - 12, height: 4 },
+  { x: 10, y: HEIGHT - 2, width: WIDTH - 20, height: 2 }
+];
 const POLL_MS = 3000;
 const TIMEOUT_MS = 4000;
 const SAMPLE_COUNT = 10;
@@ -114,6 +123,9 @@ function launch() {
 
   win = new BrowserWindow({
     width: WIDTH, height: HEIGHT,
+    minWidth: WIDTH, minHeight: HEIGHT,
+    maxWidth: WIDTH, maxHeight: HEIGHT,
+    useContentSize: true,
     x: Math.round(x + width - WIDTH - MARGIN),
     y: Math.round(y + MARGIN),
     frame: false, transparent: true, resizable: false, movable: true,
@@ -126,7 +138,14 @@ function launch() {
     }
   });
 
-  win.once('ready-to-show', () => { win.show(); win.setAlwaysOnTop(true, 'screen-saver'); });
+  win.once('ready-to-show', () => {
+    win.setContentSize(WIDTH, HEIGHT, false);
+    if (process.platform === 'win32' && typeof win.setShape === 'function') {
+      win.setShape(WINDOW_SHAPE);
+    }
+    win.show();
+    win.setAlwaysOnTop(true, 'screen-saver');
+  });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   win.setMenuBarVisibility(false);
 
@@ -139,8 +158,8 @@ function launch() {
       click: () => {
         dialog.showMessageBox(win, {
           type: 'info',
-          title: 'LiveNAT v1.1.0',
-          message: 'LiveNAT v1.1.0',
+          title: 'LiveNAT v1.1.1',
+          message: 'LiveNAT v1.1.1',
           detail: 'Minimal internet connectivity indicator für ICE-Züge.\n\nCredits:\n• Jens Schneider — Idee, Design & Entwicklung\n• GitHub Copilot (Claude) — Pair Programming & Implementierung\n\ngithub.com/jenssgb/LiveNAT',
           buttons: ['OK']
         });
