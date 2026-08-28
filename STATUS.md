@@ -15,13 +15,14 @@ LiveNAT 1.1.1 is available for Windows x64 and Windows ARM64/Snapdragon.
   - Size: 80,013,195 bytes
   - SHA-256: `2c05adbcbecce9672edd6ddde3f56edac6cced13276270ddbf3b6e02127a0b08`
 
-The ARM64 installer was downloaded and validated on a Windows Snapdragon
+The 1.1.1 ARM64 installer was downloaded and validated on a Windows Snapdragon
 device:
 
-- Installed version: 1.1.0
+- Installed version: 1.1.1
 - Installed executable machine type: ARM64
 - Installer SHA-256 matched the published release digest
 - LiveNAT starts and remains responsive
+- Native interactive window region: 200 x 60 pixels
 - Desktop and Start Menu shortcuts exist
 
 ## Implemented
