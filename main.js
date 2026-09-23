@@ -108,9 +108,7 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.whenReady().then(launch);
-  app.on('second-instance', () => {
-    if (win) { if (win.isMinimized()) win.restore(); win.focus(); }
-  });
+  app.on('second-instance', showWindow);
 }
 
 app.on('window-all-closed', () => {
@@ -143,8 +141,7 @@ function launch() {
     if (process.platform === 'win32' && typeof win.setShape === 'function') {
       win.setShape(WINDOW_SHAPE);
     }
-    win.show();
-    win.setAlwaysOnTop(true, 'screen-saver');
+    showWindow();
   });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   win.setMenuBarVisibility(false);
@@ -176,4 +173,13 @@ function launch() {
   monitor.start();
 
   win.on('closed', () => { if (monitor) { monitor.stop(); monitor = null; } win = null; });
+}
+
+function showWindow() {
+  if (!win || win.isDestroyed()) return;
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.show();
+  win.setAlwaysOnTop(true, 'screen-saver');
+  win.moveTop();
+  win.focus();
 }
